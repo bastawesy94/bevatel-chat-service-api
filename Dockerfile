@@ -10,8 +10,11 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy source code to work directory
+# Copy source code to working directory
 COPY . .
+
+# Build the application
+RUN npm run build
 
 # Expose port 3000
 EXPOSE 3000
