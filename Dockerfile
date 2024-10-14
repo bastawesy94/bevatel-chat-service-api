@@ -16,8 +16,5 @@ COPY . .
 # Expose port 3000
 EXPOSE 3000
 
-# Run the seed script
-RUN npm run seed:prod
-
 # Command to run the application
 CMD ["npm", "run", "start:prod"]
