@@ -98,8 +98,9 @@ jobs:
           # Commit changes
           git commit -m "Update version" || echo "No changes to commit"
 
-          # Push changes to the production branch
-          git push origin production
+          # Push changes to the production branch using GITHUB_TOKEN for authentication
+          git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/bastawesy94/repository.git production
+
 
 
       - name: Pull New Image on Koyeb
