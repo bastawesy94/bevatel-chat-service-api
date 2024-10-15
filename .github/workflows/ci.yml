@@ -101,8 +101,6 @@ jobs:
           # Push changes to the production branch using GITHUB_TOKEN for authentication
           git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/bastawesy94/bevatel-chat-service-api.git production
 
-
-
       - name: Pull New Image on Koyeb
         run: |
           curl -X POST https://api.koyeb.com/v1/services/your-service-id/deploy \
