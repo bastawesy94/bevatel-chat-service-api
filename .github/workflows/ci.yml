@@ -57,9 +57,13 @@ jobs:
           # Increment the version in package.json (this ensures Docker image and deployment use the same version)
           npm version patch -m "Increment version to %s"
 
-          # Commit the version change and push to production
+          # Stage the changes made to package.json and package-lock.json
           git add package.json package-lock.json
+
+          # Commit the version change and push to production
           git commit -m "Update version to $(jq -r '.version' package.json)"
+
+          # Push the version changes to production
           git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/bastawesy94/bevatel-chat-service-api.git production
 
       - name: Get New Version
