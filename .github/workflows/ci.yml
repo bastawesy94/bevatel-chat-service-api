@@ -47,24 +47,36 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      # NEW: Docker login step
+      # Docker login step
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # Build the Docker image using the current version (e.g., 0.0.17)
       - name: Build Docker Image
         run: |
           VERSION=$(jq -r '.version' package.json)
           docker build -t ${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:$VERSION .
 
+      # Push the Docker image with the current version (e.g., 0.0.17)
       - name: Push Docker Image
         run: |
           VERSION=$(jq -r '.version' package.json)
           docker push ${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:$VERSION
 
-      # Increment version AFTER Docker image is built and pushed
+      # Redeploy the correct version to Koyeb (e.g., 0.0.17)
+      - name: Deploy to Koyeb
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          DEPLOY_PAYLOAD="{\"image\": \"${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:$VERSION\"}"
+          curl -X POST https://app.koyeb.com/v1/services/1ecc505d-ac58-4c8f-a83b-d4e62e44c826/redeploy \
+          -H "Authorization: Bearer ${{ secrets.KOYEB_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d "$DEPLOY_PAYLOAD"
+
+      # Increment version AFTER deploying the current version to Koyeb
       - name: Increment Version
         id: increment_version
         run: |
@@ -79,7 +91,7 @@ jobs:
           git status
 
           # Commit any changes if necessary to avoid conflicts
-          git commit -m "Committing changes before version increment" || echo "No changes to commit"
+          git commit -m "Committing changes before version increment" || true
           
           # Increment the version in package.json
           npm version patch -m "Increment version to %s"
@@ -87,6 +99,7 @@ jobs:
           # Output the new version
           echo "New version: $(jq -r '.version' package.json)" > version.txt
 
+      # Commit the incremented version (e.g., 0.0.18) for the next cycle
       - name: Commit and Push Version Change
         run: |
           # Set up Git user identity
@@ -97,28 +110,7 @@ jobs:
           git add package.json version.txt
 
           # Commit changes
-          git commit -m "Update version" || echo "No changes to commit"
+          git commit -m "Update version" || true
 
           # Push changes to the production branch using GITHUB_TOKEN for authentication
-          git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/bastawesy94/bevatel-chat-service-api.git production
-
-      - name: Get Version
-        id: get_version
-        run: echo "VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
-
-      - name: Print Data for Curl
-        run: |
-          DEPLOY_PAYLOAD="{\"image\": \"${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:${{ env.VERSION }}\"}"
-          echo "Deploy Payload: $DEPLOY_PAYLOAD"
-
-      - name: Deploy to Koyeb
-        run: |
-          DEPLOY_PAYLOAD="{\"image\": \"${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:${{ env.VERSION }}\"}"
-          curl -X POST https://app.koyeb.com/v1/services/1ecc505d-ac58-4c8f-a83b-d4e62e44c826/redeploy \
-          -H "Authorization: Bearer ${{ secrets.KOYEB_API_KEY }}" \
-          -H "Content-Type: application/json" \
-          -d "$DEPLOY_PAYLOAD"
-
-        env:
-          KOYEB_API_KEY: ${{ secrets.KOYEB_API_KEY }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/bastawesy94/bevatel-chat-service-api.git production || true
