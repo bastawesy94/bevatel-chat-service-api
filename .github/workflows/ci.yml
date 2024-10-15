@@ -99,7 +99,7 @@ jobs:
           git commit -m "Update version" || echo "No changes to commit"
 
           # Push changes to the production branch using GITHUB_TOKEN for authentication
-          git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/bastawesy94/repository.git production
+          git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@https://github.com/bastawesy94/bevatel-chat-service-api.git production
 
 
 
