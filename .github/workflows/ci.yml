@@ -33,7 +33,7 @@ jobs:
 
   build-new-production-version:
     runs-on: ubuntu-latest
-    needs: ci
+    needs: CI
     if: github.ref == 'refs/heads/production'
     steps:
       - name: Checkout Repository
@@ -47,22 +47,73 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      # Step 1: Get the current version from package.json
-      - name: Get Current Version
+      # NEW: Docker login step
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker Image
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:$VERSION .
+
+      - name: Push Docker Image
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          docker push ${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:$VERSION
+
+      # Increment version AFTER Docker image is built and pushed
+      - name: Increment Version
+        id: increment_version
+        run: |
+          # Set up Git user identity
+          git config --local user.email "mohamedel.bastawesy2020@gmail.com"
+          git config --local user.name "bastawesy94"
+
+          # Stage any changes to package-lock.json
+          git add package-lock.json
+
+          # Ensure the working directory is clean
+          git status
+
+          # Commit any changes if necessary to avoid conflicts
+          git commit -m "Committing changes before version increment" || echo "No changes to commit"
+          
+          # Increment the version in package.json
+          npm version patch -m "Increment version to %s"
+          
+          # Output the new version
+          echo "New version: $(jq -r '.version' package.json)" > version.txt
+
+      - name: Commit and Push Version Change
+        run: |
+          # Set up Git user identity
+          git config --local user.email "mohamedel.bastawesy2020@gmail.com"
+          git config --local user.name "bastawesy94"
+
+          # Stage changes to package.json and version.txt
+          git add package.json version.txt
+
+          # Commit changes
+          git commit -m "Update version" || echo "No changes to commit"
+
+          # Push changes to the production branch using GITHUB_TOKEN for authentication
+          git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/bastawesy94/bevatel-chat-service-api.git production
+
+      - name: Get Version
         id: get_version
         run: echo "VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
 
-      # Step 2: Build and push the Docker image with the current version
-      - name: Build and Push Docker Image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:${{ env.VERSION }} .
-          docker push ${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:${{ env.VERSION }}
-
-      # Step 3: Deploy the current version to Koyeb
-      - name: Deploy to Koyeb
+      - name: Print Data for Curl
         run: |
           DEPLOY_PAYLOAD="{\"image\": \"${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:${{ env.VERSION }}\"}"
           echo "Deploy Payload: $DEPLOY_PAYLOAD"
+
+      - name: Deploy to Koyeb
+        run: |
+          DEPLOY_PAYLOAD="{\"image\": \"${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:${{ env.VERSION }}\"}"
           curl -X POST https://app.koyeb.com/v1/services/1ecc505d-ac58-4c8f-a83b-d4e62e44c826/redeploy \
           -H "Authorization: Bearer ${{ secrets.KOYEB_API_KEY }}" \
           -H "Content-Type: application/json" \
@@ -71,13 +122,3 @@ jobs:
         env:
           KOYEB_API_KEY: ${{ secrets.KOYEB_API_KEY }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-
-      # Step 4: Increment the version after successful deployment
-      - name: Increment Version
-        run: |
-          git config --local user.email "mohamedel.bastawesy2020@gmail.com"
-          git config --local user.name "bastawesy94"
-          npm version patch -m "Increment version to %s"
-          git add package.json package-lock.json
-          git commit -m "Increment version to $(jq -r '.version' package.json)"
-          git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/bastawesy94/bevatel-chat-service-api.git production
