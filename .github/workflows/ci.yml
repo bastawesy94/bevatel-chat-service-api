@@ -101,12 +101,22 @@ jobs:
           # Push changes to the production branch using GITHUB_TOKEN for authentication
           git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/bastawesy94/bevatel-chat-service-api.git production
 
-      - name: Pull New Image on Koyeb
+      - name: Get Version
+        id: get_version
+        run: echo "VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
+
+      - name: Print Data for Curl
         run: |
+          DEPLOY_PAYLOAD="{\"image\": \"${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:${{ env.VERSION }}\"}"
+          echo "Deploy Payload: $DEPLOY_PAYLOAD"
+
+      - name: Deploy to Koyeb
+        run: |
+          DEPLOY_PAYLOAD="{\"image\": \"${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:${{ env.VERSION }}\"}"
           curl -X POST https://app.koyeb.com/v1/services/1ecc505d-ac58-4c8f-a83b-d4e62e44c826/redeploy \
-          -H "Authorization: Bearer ${{secrets.KOYEB_API_KEY}}" \
+          -H "Authorization: Bearer ${{ secrets.KOYEB_API_KEY }}" \
           -H "Content-Type: application/json" \
-          -d "{\"image\": \"${{secrets.DOCKER_USERNAME}}/bevatel-chat-service-api:$(jq -r '.version' package.json)\"}"
+          -d "$DEPLOY_PAYLOAD"
 
         env:
           KOYEB_API_KEY: ${{ secrets.KOYEB_API_KEY }}
