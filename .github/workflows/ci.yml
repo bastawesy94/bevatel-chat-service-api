@@ -31,7 +31,7 @@ jobs:
       - name: Lint Code
         run: npm run lint
 
-  build-new-production-vesion:
+  build-new-production-version:
     runs-on: ubuntu-latest
     needs: CI
     if: github.ref == 'refs/heads/production'
@@ -66,27 +66,30 @@ jobs:
           VERSION=$(jq -r '.version' package.json)
           docker push ${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:$VERSION
 
-      # Redeploy the correct version to Koyeb (e.g., 0.0.17)
-      - name: Deploy to Koyeb
-        run: |
-          VERSION=$(jq -r '.version' package.json)
-          DEPLOY_PAYLOAD="{
-            \"deployment_group\": \"production\",
-            \"sha\": \"${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:$VERSION\",
-            \"use_cache\": true,
-            \"skip_build\": true
-          }"
+  deploy-to-koyeb:
+    runs-on: ubuntu-latest
+    needs: build-new-production-version
+    concurrency:
+      group: "${{ github.ref_name }}"
+      cancel-in-progress: true
+    steps:
+      # Install Koyeb CLI and configure API token
+      - name: Install and configure the Koyeb CLI
+        uses: koyeb-community/koyeb-actions@v2
+        with:
+          api_token: "${{ secrets.KOYEB_API_KEY }}"
 
-          # Print the payload before making the request
-          echo "Deploy Payload: $DEPLOY_PAYLOAD"
+      # Deploy the application using Koyeb Git deploy action
+      - name: Build and deploy the application to Koyeb
+        uses: koyeb/action-git-deploy@v1
+        with:
+          app-name: nestjs-${{ github.ref_name }}
+          service-ports: "3000:http"
+          service-routes: "/:3000"
+          service-env: "PORT=3000"
+          skip-cache: true
 
-          curl -X POST https://app.koyeb.com/v1/services/1ecc505d-ac58-4c8f-a83b-d4e62e44c826/redeploy \
-          -H "Authorization: Bearer ${{ secrets.KOYEB_API_KEY }}" \
-          -H "Content-Type: application/json" \
-          -d "$DEPLOY_PAYLOAD"
-
-
-      # Increment version AFTER deploying the current version to Koyeb
+      # Increment version AFTER deploying to Koyeb
       - name: Increment Version
         id: increment_version
         run: |
@@ -96,9 +99,6 @@ jobs:
 
           # Stage any changes to package-lock.json
           git add package-lock.json
-
-          # Ensure the working directory is clean
-          git status
 
           # Commit any changes if necessary to avoid conflicts
           git commit -m "Committing changes before version increment" || true
