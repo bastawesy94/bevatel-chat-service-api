@@ -66,8 +66,19 @@ jobs:
       - name: Increment Version
         id: increment_version
         run: |
+          # Ensure the working directory is clean
+          git status
+          
+          # Commit any changes if necessary to avoid conflicts
+          git add -A
+          git commit -m "Committing changes before version increment" || echo "No changes to commit"
+          
+          # Increment the version in package.json
           npm version patch -m "Increment version to %s"
+          
+          # Output the new version
           echo "New version: $(jq -r '.version' package.json)" > version.txt
+
 
       - name: Commit and Push Version Change
         run: |
