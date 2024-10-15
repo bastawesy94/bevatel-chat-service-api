@@ -71,8 +71,8 @@ jobs:
 
       - name: Commit and Push Version Change
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "mohamedel.bastawesy94@gmail.com"
+          git config --local user.name "bastawesy94"
           git add package.json
           git commit -m "Update version"
           git push origin production
