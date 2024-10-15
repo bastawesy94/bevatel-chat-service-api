@@ -104,7 +104,7 @@ jobs:
       - name: Pull New Image on Koyeb
         run: |
           curl -X POST https://app.koyeb.com/v1/services/1ecc505d-ac58-4c8f-a83b-d4e62e44c826/redeploy \
-          -H "Authorization:Bearer $KOYEB_API_KEY" \
+          -H "Authorization: Bearer ${{ secrets.KOYEB_API_KEY }}" \
           -H "Content-Type:application/json" \
           -d "{\"image\": \"${DOCKER_USERNAME}/bevatel-chat-service-api:$(jq -r '.version' package.json)\"}"
         env:
