@@ -10,5 +10,5 @@ export class User {
   username: string;
 
   @Column()
-  password: string;  // Basic auth; you can replace it with OAuth, JWT, etc.
+  password: string; // Basic auth; you can replace it with OAuth, JWT, etc.
 }

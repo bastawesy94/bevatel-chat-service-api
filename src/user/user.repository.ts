@@ -21,6 +21,6 @@ export class UserRepository {
   }
 
   async findById(id: number): Promise<User> {
-    return this.userRepo.findOne({where: {id}});
+    return this.userRepo.findOne({ where: { id } });
   }
 }

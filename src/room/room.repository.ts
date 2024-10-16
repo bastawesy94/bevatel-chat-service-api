@@ -21,7 +21,7 @@ export class RoomRepository {
   }
 
   async findById(id: number): Promise<Room> {
-    return this.roomRepo.findOne({where:{id}});
+    return this.roomRepo.findOne({ where: { id } });
   }
 
   async findAll(): Promise<Room[]> {

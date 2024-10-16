@@ -7,11 +7,19 @@ import { Message } from './message.entity';
 export class MessageService {
   constructor(private readonly messageRepository: MessageRepository) {}
 
-  async sendMessage(content: string, roomId: number, userId: number): Promise<Message> {
+  async sendMessage(
+    content: string,
+    roomId: number,
+    userId: number,
+  ): Promise<Message> {
     return this.messageRepository.create(content, roomId, userId);
   }
 
-  async getMessagesByRoom(roomId: number, limit: number, offset: number): Promise<Message[]> {
+  async getMessagesByRoom(
+    roomId: number,
+    limit: number,
+    offset: number,
+  ): Promise<Message[]> {
     return this.messageRepository.findMessagesByRoom(roomId, limit, offset);
   }
 }

@@ -13,7 +13,10 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'User successfully created' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   async createUser(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto.username, createUserDto.password);
+    return this.userService.create(
+      createUserDto.username,
+      createUserDto.password,
+    );
   }
 
   @Get(':id')

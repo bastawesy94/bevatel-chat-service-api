@@ -30,11 +30,19 @@ console.log('process.env.DATABASE_URL --->', process.env.DATABASE_URL);
       type: 'postgres',
       url: process.env.DATABASE_URL,
       entities: [Room, Message, User],
-      synchronize: true,  // for development purposes
+      synchronize: true, // for development purposes
     }),
     TypeOrmModule.forFeature([User, Room, Message]),
   ],
   controllers: [UserController, RoomController, MessageController],
-  providers: [UserService, UserRepository, RoomService, RoomRepository, MessageService, MessageRepository, ChatGateway],
+  providers: [
+    UserService,
+    UserRepository,
+    RoomService,
+    RoomRepository,
+    MessageService,
+    MessageRepository,
+    ChatGateway,
+  ],
 })
 export class AppModule {}
