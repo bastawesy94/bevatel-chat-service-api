@@ -86,7 +86,7 @@ jobs:
         run: |
           VERSION=$(jq -r '.version' package.json)
           koyeb services update bevatel-chat-service-api \
-            --image ${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:$VERSION
+            --docker ${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:$VERSION
         shell: /usr/bin/bash -e {0}
 
       # Increment version AFTER deploying to Koyeb
