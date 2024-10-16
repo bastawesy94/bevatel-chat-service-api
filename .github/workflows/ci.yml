@@ -85,7 +85,7 @@ jobs:
       - name: Build Docker Image and Deploy
         run: |
           VERSION=$(jq -r '.version' package.json)
-          koyeb services update bevatel-chat-service-api \
+          koyeb services update shrill-devora/bevatel-chat-service-api \
             --docker ${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:$VERSION
         shell: /usr/bin/bash -e {0}
 
