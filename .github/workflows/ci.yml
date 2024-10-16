@@ -80,7 +80,7 @@ jobs:
       - name: Install and configure the Koyeb CLI
         uses: koyeb-community/koyeb-actions@v2
         with:
-          api_token: "${{ secrets.KOYEB_API_TOKEN }}"
+          api_token: "${{ secrets.KOYEB_API_KEY }}"
 
       - name: Build Docker Image and Deploy
         run: |
