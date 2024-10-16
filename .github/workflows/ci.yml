@@ -79,15 +79,13 @@ jobs:
         with:
           api_token: "${{ secrets.KOYEB_API_KEY }}"
 
-      # Deploy the application using Koyeb Git deploy action
-      - name: Build and deploy the application to Koyeb
-        uses: koyeb/action-git-deploy@v1
-        with:
-          app-name: bevatel-chat-service-api:$VERSION
-          service-ports: "3000:http"
-          service-routes: "/:3000"
-          service-env: "PORT=3000"
-          skip-cache: true
+      # Deploy the Docker image to Koyeb using the version from the Docker build
+      - name: Deploy Docker Image to Koyeb
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          koyeb services update bevatel-chat-service-api \
+            --image ${{ secrets.DOCKER_USERNAME }}/bevatel-chat-service-api:$VERSION
+
 
       # Increment version AFTER deploying to Koyeb
       - name: Increment Version
