@@ -1,4 +1,3 @@
-// rooms/room.service.ts
 import { Injectable, Inject } from '@nestjs/common';
 import { Room } from './room.entity';
 import { IRoomsRepository } from './interfaces/IRoomsRepository';

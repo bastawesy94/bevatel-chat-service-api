@@ -22,7 +22,7 @@ export class MessageController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get messages for a room with pagination' }) //@TO-DO NEED REFACTOR !!!!
+  @ApiOperation({ summary: 'Get messages for a room with pagination' })
   @ApiResponse({ status: 200, description: 'Messages retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Room not found' })
   @Get()
@@ -32,11 +32,10 @@ export class MessageController {
     @Query('page') page?: number,
     @Query('order') order?: 'ASC' | 'DESC',
   ) {
-    // Set default values for pagination options
     const paginationOptions: PaginationOptions = {
-      limit: limit ?? 10, // default limit to 10 if not provided
-      page: page ?? 1, // default page to 1 if not provided
-      order: order ?? 'DESC', // default order to DESC if not provided
+      limit: limit ?? 10,
+      page: page ?? 1,
+      order: order ?? 'DESC',
     };
 
     return this.messageService.getMessagesByRoom(roomId, paginationOptions);

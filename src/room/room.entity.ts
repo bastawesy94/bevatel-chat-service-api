@@ -1,4 +1,3 @@
-// rooms/room.entity.ts
 import { Message } from 'src/message/message.entity';
 import { User } from 'src/user/user.entity';
 import {

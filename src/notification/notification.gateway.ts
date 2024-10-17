@@ -1,4 +1,3 @@
-// notification.gateway.ts
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -23,7 +22,6 @@ export class NotificationGateway {
     this.server.to(`user_${userId}`).emit('notification', content);
   }
 
-  // Optional: User can mark notifications as read via WebSocket
   @SubscribeMessage('markAsRead')
   async handleMarkAsRead(client: any, notificationId: number) {
     await this.notificationService.markAsRead(notificationId);

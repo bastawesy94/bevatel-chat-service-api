@@ -1,5 +1,3 @@
-// rooms/IRoomsRepository.ts
-
 import { User } from 'src/user/user.entity';
 import { Room } from '../room.entity';
 

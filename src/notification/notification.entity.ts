@@ -1,4 +1,3 @@
-// notification.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from 'src/user/user.entity';
 
@@ -20,5 +19,5 @@ export class Notification {
   createdAt: Date;
 
   @Column()
-  type: string; // e.g., 'message' or 'roomJoin'
+  type: string;
 }

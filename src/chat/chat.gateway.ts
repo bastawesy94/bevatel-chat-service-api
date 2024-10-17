@@ -31,7 +31,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject('IRoomsRepository')
     private readonly roomsRepository: IRoomsRepository,
     private readonly usersService: UsersService,
-    private readonly notificationService: NotificationService, // Inject NotificationService
+    private readonly notificationService: NotificationService,
   ) {}
 
   handleConnection(client: Socket) {

@@ -1,4 +1,3 @@
-// user.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -17,13 +16,18 @@ export class User {
   @Column()
   username: string;
 
+  @Column()
+  email: string;
+
+  @Column()
+  password: string;
+
   @OneToMany(() => Notification, (notification) => notification.user)
   notifications: Notification[];
 
   @ManyToMany(() => Room, (room) => room.users)
   rooms: Room[];
 
-  // You can also add unread messages count if required
   @Column({ default: 0 })
   unreadMessagesCount: number;
 }

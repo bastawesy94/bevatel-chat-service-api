@@ -28,14 +28,14 @@ console.log('process.env.DATABASE_URL --->', process.env.DATABASE_URL);
       type: 'postgres',
       url: process.env.DATABASE_URL,
       entities: [Room, Message, User, Notification],
-      synchronize: true, // Automatically syncs entities with DB (use only in development)
+      synchronize: true,
     }),
     UsersModule,
     RoomsModule,
     MessagesModule,
-    ChatModule, // Import ChatModule
+    ChatModule,
     NotificationModule,
   ],
-  providers: [ChatGateway], // WebSocket gateway for real-time chat communication
+  providers: [ChatGateway],
 })
 export class AppModule {}

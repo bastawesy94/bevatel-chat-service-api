@@ -1,4 +1,3 @@
-// rooms/room.repository.ts
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -32,7 +31,7 @@ export class RoomsRepository implements IRoomsRepository {
       relations: ['messages'],
     });
   }
-  // Implementation of the findUsersByRoom method
+
   async findUsersByRoom(roomId: number): Promise<User[]> {
     const room = await this.repository.findOne({
       where: { id: roomId },
@@ -41,6 +40,6 @@ export class RoomsRepository implements IRoomsRepository {
     if (!room) {
       return [];
     }
-    return room.users; // Assuming the Room entity has a 'users' relation
+    return room.users;
   }
 }

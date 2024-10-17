@@ -10,11 +10,11 @@ import { RoomController } from './room.controller';
   providers: [
     RoomsService,
     {
-      provide: 'IRoomsRepository', // Provide the token
-      useClass: RoomsRepository, // Use RoomsRepository as the implementation
+      provide: 'IRoomsRepository',
+      useClass: RoomsRepository,
     },
   ],
   controllers: [RoomController],
-  exports: [RoomsService, 'IRoomsRepository'], // Export both
+  exports: [RoomsService, 'IRoomsRepository'],
 })
 export class RoomsModule {}

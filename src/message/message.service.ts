@@ -1,4 +1,3 @@
-// messages/message.service.ts
 import { Injectable, Inject } from '@nestjs/common';
 import { Message } from './message.entity';
 import { IMessagesRepository } from './interfaces/IMessagesRepository';

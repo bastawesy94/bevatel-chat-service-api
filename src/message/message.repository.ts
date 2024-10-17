@@ -1,4 +1,3 @@
-// messages/message.repository.ts
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,11 +19,10 @@ export class MessagesRepository implements IMessagesRepository {
   ): Promise<Message> {
     const message = this.repository.create({
       content,
-      room: { id: roomId }, // Assuming room is a relation
-      user: { id: userId }, // Assuming user is a relation
+      room: { id: roomId },
+      user: { id: userId },
     });
 
-    // Ensure save is properly called
     return await this.repository.save(message);
   }
 
@@ -34,14 +32,11 @@ export class MessagesRepository implements IMessagesRepository {
   ): Promise<{ data: Message[]; total: number }> {
     const { limit = 10, page = 1, order = 'DESC' } = options;
 
-    // Ensure the limit and page values are positive
     const actualLimit = Math.max(1, limit);
     const actualPage = Math.max(1, page);
 
-    // Calculate the offset for pagination
     const offset = (actualPage - 1) * actualLimit;
 
-    // Fetch messages with pagination and ordering
     const [messages, total] = await this.repository.findAndCount({
       where: { room: { id: roomId } },
       order: { createdAt: order },

@@ -1,20 +1,33 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
 import { UsersService } from './user.service';
+import { JwtStrategy } from './jwt.strategy';
 import { UsersRepository } from './user.repository';
-import { User } from './user.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserController } from './user.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
-  providers: [
-    UsersService,
-    {
-      provide: 'IUsersRepository', // Token for repository
-      useClass: UsersRepository, // Implementation of repository
-    },
+  imports: [
+    ConfigModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '1h' },
+      }),
+    }),
   ],
   controllers: [UserController],
-  exports: [UsersService, 'IUsersRepository'], // Export both the service and repository
+  providers: [
+    UsersService,
+    { provide: 'IUsersRepository', useClass: UsersRepository },
+    JwtStrategy,
+  ],
+  exports: [
+    UsersService,
+    { provide: 'IUsersRepository', useClass: UsersRepository },
+    JwtStrategy,
+  ],
 })
 export class UsersModule {}
