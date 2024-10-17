@@ -31,7 +31,7 @@
 ## Installation
 
 ```bash
-$ npm install
+$ docker-compose up adminer postgres api
 ```
 
 ## Running the app
