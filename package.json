@@ -1,6 +1,6 @@
 {
   "name": "bevatel-chat-service-api",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "",
   "author": "",
   "private": true,
@@ -83,5 +83,4 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   }
-  
 }
