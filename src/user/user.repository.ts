@@ -1,26 +1,24 @@
-// users/user.repository.ts
+// users.repository.ts
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { User } from './user.entity';
+import { IUsersRepository } from './interfaces/IUserRepository';
 
 @Injectable()
-export class UserRepository {
-  constructor(
-    @InjectRepository(User)
-    private readonly userRepo: Repository<User>,
-  ) {}
-
-  async create(username: string, password: string): Promise<User> {
-    const user = this.userRepo.create({ username, password });
-    return this.userRepo.save(user);
+export class UsersRepository
+  extends Repository<User>
+  implements IUsersRepository
+{
+  constructor(private dataSource: DataSource) {
+    super(User, dataSource.createEntityManager());
   }
 
-  async findByUsername(username: string): Promise<User> {
-    return this.userRepo.findOne({ where: { username } });
+  async getById(id: number): Promise<User | null> {
+    return this.findOne({ where: { id } });
   }
 
-  async findById(id: number): Promise<User> {
-    return this.userRepo.findOne({ where: { id } });
+  async createUser(userData: Partial<User>): Promise<User> {
+    const user = this.create(userData);
+    return this.save(user);
   }
 }

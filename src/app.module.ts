@@ -6,17 +6,15 @@ import { User } from './user/user.entity';
 import { ConfigModule } from '@nestjs/config';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
-import { UserController } from './user/user.controller';
-import { RoomController } from './room/room.controller';
-import { MessageController } from './message/message.controller';
-import { UserService } from './user/user.service';
-import { UserRepository } from './user/user.repository';
-import { RoomService } from './room/room.service';
-import { RoomRepository } from './room/room.repository';
-import { MessageService } from './message/message.service';
-import { MessageRepository } from './message/message.repository';
-import { ChatGateway } from './chat.gateway';
+import { ChatGateway } from './chat/chat.gateway';
+import { ChatModule } from './chat/chat.module';
+import { RoomsModule } from './room/rooms.module';
+import { UsersModule } from './user/user.module';
+import { MessagesModule } from './message/messag.module';
+import { NotificationModule } from './notification/notification.module';
+import { Notification } from './notification/notification.entity';
 
+// Load environment variables
 dotenv.config({
   path: path.resolve(__dirname, `../.env.${process.env.NODE_ENV}`),
 });
@@ -29,20 +27,15 @@ console.log('process.env.DATABASE_URL --->', process.env.DATABASE_URL);
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
-      entities: [Room, Message, User],
-      synchronize: true, // for development purposes
+      entities: [Room, Message, User, Notification],
+      synchronize: true, // Automatically syncs entities with DB (use only in development)
     }),
-    TypeOrmModule.forFeature([User, Room, Message]),
+    UsersModule,
+    RoomsModule,
+    MessagesModule,
+    ChatModule, // Import ChatModule
+    NotificationModule,
   ],
-  controllers: [UserController, RoomController, MessageController],
-  providers: [
-    UserService,
-    UserRepository,
-    RoomService,
-    RoomRepository,
-    MessageService,
-    MessageRepository,
-    ChatGateway,
-  ],
+  providers: [ChatGateway], // WebSocket gateway for real-time chat communication
 })
 export class AppModule {}

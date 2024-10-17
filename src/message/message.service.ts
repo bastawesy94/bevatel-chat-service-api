@@ -1,25 +1,32 @@
 // messages/message.service.ts
-import { Injectable } from '@nestjs/common';
-import { MessageRepository } from './message.repository';
+import { Injectable, Inject } from '@nestjs/common';
 import { Message } from './message.entity';
+import { IMessagesRepository } from './interfaces/IMessagesRepository';
+import { PaginationOptions } from './interfaces/IQuertOptions';
 
 @Injectable()
-export class MessageService {
-  constructor(private readonly messageRepository: MessageRepository) {}
+export class MessagesService {
+  constructor(
+    @Inject('IMessagesRepository')
+    private readonly messagesRepository: IMessagesRepository,
+  ) {}
 
-  async sendMessage(
+  async createMessage(
     content: string,
     roomId: number,
     userId: number,
   ): Promise<Message> {
-    return this.messageRepository.create(content, roomId, userId);
+    return this.messagesRepository.createMessage(content, roomId, userId);
   }
 
   async getMessagesByRoom(
     roomId: number,
-    limit: number,
-    offset: number,
-  ): Promise<Message[]> {
-    return this.messageRepository.findMessagesByRoom(roomId, limit, offset);
+    options?: PaginationOptions,
+  ): Promise<{ data: Message[]; total: number }> {
+    return this.messagesRepository.getMessagesByRoom(roomId, options);
+  }
+
+  async getMessageById(id: number): Promise<Message | null> {
+    return this.messagesRepository.findById(id);
   }
 }

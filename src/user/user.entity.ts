@@ -1,14 +1,29 @@
-// users/user.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+// user.entity.ts
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToMany,
+} from 'typeorm';
+import { Notification } from 'src/notification/notification.entity';
+import { Room } from 'src/room/room.entity';
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column()
   username: string;
 
-  @Column()
-  password: string; // Basic auth; you can replace it with OAuth, JWT, etc.
+  @OneToMany(() => Notification, (notification) => notification.user)
+  notifications: Notification[];
+
+  @ManyToMany(() => Room, (room) => room.users)
+  rooms: Room[];
+
+  // You can also add unread messages count if required
+  @Column({ default: 0 })
+  unreadMessagesCount: number;
 }

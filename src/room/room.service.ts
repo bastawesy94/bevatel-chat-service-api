@@ -1,21 +1,24 @@
 // rooms/room.service.ts
-import { Injectable } from '@nestjs/common';
-import { RoomRepository } from './room.repository';
+import { Injectable, Inject } from '@nestjs/common';
 import { Room } from './room.entity';
+import { IRoomsRepository } from './interfaces/IRoomsRepository';
 
 @Injectable()
-export class RoomService {
-  constructor(private readonly roomRepository: RoomRepository) {}
+export class RoomsService {
+  constructor(
+    @Inject('IRoomsRepository')
+    private readonly roomsRepository: IRoomsRepository,
+  ) {}
 
-  async create(name: string): Promise<Room> {
-    return this.roomRepository.create(name);
+  async createRoom(name: string): Promise<Room> {
+    return this.roomsRepository.createRoom(name);
   }
 
-  async findById(id: number): Promise<Room> {
-    return this.roomRepository.findById(id);
+  async getAllRooms(): Promise<Room[]> {
+    return this.roomsRepository.findAll();
   }
 
-  async findAll(): Promise<Room[]> {
-    return this.roomRepository.findAll();
+  async getRoomById(id: number): Promise<Room | null> {
+    return this.roomsRepository.findById(id);
   }
 }
